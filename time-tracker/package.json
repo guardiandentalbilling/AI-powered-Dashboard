@@ -1,0 +1,58 @@
+{
+  "name": "guardian-time-tracker",
+  "version": "1.0.0",
+  "description": "Employee time tracking application with screenshot monitoring",
+  "private": true,
+  "workspaces": [
+    "desktop-app",
+    "backend-api", 
+    "admin-dashboard",
+    "employee-dashboard",
+    "shared"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:desktop && npm run install:backend && npm run install:admin && npm run install:employee && npm run install:shared",
+    "install:desktop": "cd desktop-app && npm install",
+    "install:backend": "cd backend-api && npm install", 
+    "install:admin": "cd admin-dashboard && npm install",
+    "install:employee": "cd employee-dashboard && npm install",
+    "install:shared": "cd shared && npm install",
+    "dev:desktop": "cd desktop-app && npm run dev",
+    "dev:backend": "cd backend-api && npm run dev",
+    "dev:admin": "cd admin-dashboard && npm run dev", 
+    "dev:employee": "cd employee-dashboard && npm run dev",
+    "build:all": "npm run build:shared && npm run build:backend && npm run build:admin && npm run build:employee && npm run build:desktop",
+    "build:desktop": "cd desktop-app && npm run build",
+    "build:backend": "cd backend-api && npm run build",
+    "build:admin": "cd admin-dashboard && npm run build",
+    "build:employee": "cd employee-dashboard && npm run build", 
+    "build:shared": "cd shared && npm run build",
+    "start:backend": "cd backend-api && npm start",
+    "start:admin": "cd admin-dashboard && npm start",
+    "start:employee": "cd employee-dashboard && npm start",
+    "test:all": "npm run test:shared && npm run test:backend && npm run test:admin && npm run test:employee",
+    "test:desktop": "cd desktop-app && npm test",
+    "test:backend": "cd backend-api && npm test",
+    "test:admin": "cd admin-dashboard && npm test",
+    "test:employee": "cd employee-dashboard && npm test",
+    "test:shared": "cd shared && npm test",
+    "lint:all": "npm run lint:desktop && npm run lint:backend && npm run lint:admin && npm run lint:employee && npm run lint:shared",
+    "lint:desktop": "cd desktop-app && npm run lint",
+    "lint:backend": "cd backend-api && npm run lint",
+    "lint:admin": "cd admin-dashboard && npm run lint", 
+    "lint:employee": "cd employee-dashboard && npm run lint",
+    "lint:shared": "cd shared && npm run lint"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "Guardian Dental Billing LLC",
+  "license": "PRIVATE"
+}

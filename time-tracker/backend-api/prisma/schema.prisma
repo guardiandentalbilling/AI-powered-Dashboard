@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(EMPLOYEE)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  timeEntries TimeEntry[]
+  screenshots Screenshot[]
+  projects    ProjectUser[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  timeEntries TimeEntry[]
+  users       ProjectUser[]
+
+  @@map("projects")
+}
+
+model ProjectUser {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  assignedAt DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_users")
+}
+
+model TimeEntry {
+  id            String          @id @default(uuid())
+  userId        String
+  projectId     String?
+  description   String?
+  startTime     DateTime
+  endTime       DateTime?
+  status        TimeEntryStatus @default(ACTIVE)
+  totalDuration Int             @default(0) // in seconds
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  screenshots Screenshot[]
+  activities  Activity[]
+
+  @@map("time_entries")
+}
+
+model Screenshot {
+  id                String    @id @default(uuid())
+  timeEntryId       String
+  userId            String
+  filePath          String
+  encryptedFilePath String
+  thumbnailPath     String?
+  capturedAt        DateTime
+  fileSize          Int
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+
+  // Relations
+  timeEntry TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("screenshots")
+}
+
+model Activity {
+  id            String   @id @default(uuid())
+  timeEntryId   String
+  mouseClicks   Int      @default(0)
+  keystrokes    Int      @default(0)
+  mouseMovement Int      @default(0)
+  scrollEvents  Int      @default(0)
+  activeWindow  String?
+  activityScore Int      @default(0)
+  recordedAt    DateTime
+  createdAt     DateTime @default(now())
+
+  // Relations
+  timeEntry TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     LogLevel
+  message   String
+  metadata  Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@map("system_logs")
+}
+
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+}
+
+enum TimeEntryStatus {
+  ACTIVE
+  PAUSED
+  STOPPED
+}
+
+enum LogLevel {
+  ERROR
+  WARN
+  INFO
+  DEBUG
+}

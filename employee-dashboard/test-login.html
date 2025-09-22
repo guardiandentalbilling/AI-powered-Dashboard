@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login and Employee List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 20px; margin: 10px 0; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Employee Dashboard - Test Login and Employee List</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Login API</h2>
+        <button onclick="testLogin()">Test Login with Demo Credentials</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Employee List API</h2>
+        <button onclick="testEmployeeList()">Test Employee List</button>
+        <div id="employeeResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Complete Flow</h2>
+        <button onclick="testCompleteFlow()">Test Login → Employee List Flow</button>
+        <div id="flowResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@test.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Login successful!</div>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        <p><strong>Token:</strong> ${data.token ? 'Generated' : 'Not received'}</p>
+                        <p><strong>Role:</strong> ${data.role}</p>`;
+                    
+                    // Store token for other tests
+                    localStorage.setItem('token', data.token);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${data.msg}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testEmployeeList() {
+            const resultDiv = document.getElementById('employeeResult');
+            resultDiv.innerHTML = 'Testing employee list...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/employees`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Employee list loaded!</div>
+                        <p><strong>Employees found:</strong> ${data.length}</p>
+                        <ul>
+                            ${data.map(emp => `<li>${emp.firstName} ${emp.lastName} (${emp.role})</li>`).join('')}
+                        </ul>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Employee list failed: ${data.msg}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testCompleteFlow() {
+            const resultDiv = document.getElementById('flowResult');
+            resultDiv.innerHTML = 'Testing complete flow...';
+            
+            try {
+                // Step 1: Login
+                resultDiv.innerHTML += '<br>Step 1: Logging in...';
+                const loginResponse = await fetch(`${API_BASE}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@test.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginResponse.ok) {
+                    throw new Error(`Login failed: ${loginData.msg}`);
+                }
+                
+                resultDiv.innerHTML += '<br>✅ Login successful';
+                
+                // Step 2: Get employees
+                resultDiv.innerHTML += '<br>Step 2: Loading employees...';
+                const empResponse = await fetch(`${API_BASE}/api/employees`);
+                const empData = await empResponse.json();
+                
+                if (!empResponse.ok) {
+                    throw new Error(`Employee list failed: ${empData.msg}`);
+                }
+                
+                resultDiv.innerHTML += `<br>✅ Employees loaded (${empData.length} found)`;
+                
+                // Step 3: Test if admin user appears in employee list
+                const adminEmployee = empData.find(emp => emp.email === 'admin@test.com');
+                if (adminEmployee) {
+                    resultDiv.innerHTML += '<br>✅ Admin user found in employee list';
+                } else {
+                    resultDiv.innerHTML += '<br>⚠️ Admin user not found in employee list (this might be expected)';
+                }
+                
+                resultDiv.innerHTML = `<div class="success">✅ Complete flow successful!</div>` + resultDiv.innerHTML;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Flow failed: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

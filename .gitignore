@@ -1,0 +1,66 @@
+# Root Git Ignore for Guardian Employee Dashboard + Time Tracker Monorepo
+
+# Environment files
+.env
+*.env
+!.env.example
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+release/
+out/
+coverage/
+.temp/
+.cache/
+
+# Electron build artifacts
+*.asar
+*.exe
+*.dmg
+*.AppImage
+*.snap
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# TypeScript
+*.tsbuildinfo
+
+# Prisma
+.prisma/
+
+# Uploads (ignore runtime uploads)
+uploads/
+!uploads/.gitkeep
+
+# Optional: lock files (uncomment to enforce single manager)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Generated assets
+**/coverage/
+**/dist/
+**/build/
+
+# Security
+*.pem
+*.key
+*.pfx
